@@ -1,0 +1,13 @@
+{
+  "id": "amhashiferaw/casmi26-library-search",
+  "title": "casmi26-library-search",
+  "code_file": "notebook.py",
+  "language": "python",
+  "kernel_type": "script",
+  "is_private": "true",
+  "enable_gpu": "false",
+  "enable_internet": "false",
+  "dataset_sources": ["amhashiferaw/casmi26-src", "amhashiferaw/rdkit-wheel-cp312"],
+  "competition_sources": ["enveda-CASMI26-molecule-id-mass-spectra"],
+  "kernel_sources": []
+}

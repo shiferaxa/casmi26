@@ -1,0 +1,11 @@
+# Core (pinned loosely; Windows cp313 wheels exist for all of these)
+numpy>=2.0
+pandas>=2.2
+pyarrow>=17
+polars>=1.0
+scipy>=1.14
+rdkit>=2025.3
+scikit-learn>=1.5
+tqdm
+pytest
+kaggle
