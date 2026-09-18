@@ -12,7 +12,7 @@ T0 = time.time()
 CFG = dict(
     d=512, layers=6, heads=8, drop=0.1, nbits=6930,
     batch=512, lr=3e-4, wd=0.01, warmup=1500, epochs=40,
-    time_budget_h=11.3,           # Kaggle GPU session limit is 12 h
+    time_budget_h=5.4,            # weekly GPU quota on this account is 6 h, the session is capped by what is left
     val_spectra=4000, val_pool=4000,
     seed=0,
 )
