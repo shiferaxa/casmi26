@@ -1,0 +1,13 @@
+{
+  "id": "amhashiferaw/casmi26-prep",
+  "title": "casmi26-prep",
+  "code_file": "notebook.py",
+  "language": "python",
+  "kernel_type": "script",
+  "is_private": "true",
+  "enable_gpu": "false",
+  "enable_internet": "false",
+  "dataset_sources": ["amhashiferaw/casmi26-train-fp"],
+  "competition_sources": ["enveda-CASMI26-molecule-id-mass-spectra"],
+  "kernel_sources": []
+}

@@ -10,3 +10,4 @@ __pycache__/
 kaggle/*/rank_train.npz
 kaggle/rdkit_wheel/*.whl
 kaggle/dataset/*.py
+kaggle/train_fp/*.npz
