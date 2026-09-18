@@ -1,0 +1,12 @@
+casmi26
+Copyright 2026 Amha Shiferaw
+
+This repository contains code derived from the public Kaggle notebook
+"0.339 Top 1 4-Channel Transformer Analog Ensemble" by haideptry, itself
+building on the "Analog Propagation - CASMI 2026 baseline" notebook and
+datasets by prvsiyan, both published under the Apache License 2.0 on
+Kaggle. The derived files are kaggle/fork_*/notebook.py, kaggle/prep and
+kaggle/train_fp (model definition), and src/casmi/fork/core.py. Changes
+made here are described in the file headers and in docs/plan.md.
+
+The spectral entropy similarity follows Li et al., Nature Methods 2021.
