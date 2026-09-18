@@ -1,6 +1,6 @@
 # casmi26
 
-Entry for the Kaggle competition Enveda CASMI 2026 (predict SMILES from LC-MS/MS spectra, metric MRR@25 on tautomer-canonical InChIKey14). Runs locally on Windows for validation, submitted as an offline Kaggle kernel.
+Entry for the Kaggle competition Enveda CASMI 2026 (predict SMILES from LC-MS/MS spectra, metric MRR@25 on tautomer-canonical InChIKey14). Runs locally on Windows for validation, submitted as an offline Kaggle kernel. Public repo: https://github.com/shiferaxa/casmi26 (branch main, Apache 2.0, see NOTICE for the forked public kernel attribution). The repo is public during the competition; anything that must stay private (data, assets, tokens) is gitignored.
 
 ## Warnings
 
