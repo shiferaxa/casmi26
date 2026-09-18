@@ -1,0 +1,20 @@
+{
+  "id": "amhashiferaw/casmi26-fork-v4",
+  "title": "casmi26-fork-v4",
+  "code_file": "notebook.py",
+  "language": "python",
+  "kernel_type": "script",
+  "is_private": "true",
+  "enable_gpu": "true",
+  "enable_internet": "false",
+  "dataset_sources": [
+    "prvsiyan/casmi26-fp-models-v2",
+    "aidensong123/casmi26-offline-rdkit-2026033",
+    "amhashiferaw/casmi26-ranker-v4",
+    "prvsiyan/chebi-lipidmaps-casmi26",
+    "prvsiyan/coconut-casmi26-candidates",
+    "thedevastator/open-source-natural-product-annotations"
+  ],
+  "competition_sources": ["enveda-CASMI26-molecule-id-mass-spectra"],
+  "kernel_sources": []
+}
