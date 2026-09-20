@@ -14,6 +14,7 @@ Entry for the Kaggle competition Enveda CASMI 2026 (predict SMILES from LC-MS/MS
 - Windows multiprocessing spawns fresh workers, so module globals set at runtime (like `core.BITS`) are None inside a Pool unless passed through an initializer. The public notebook relies on Linux fork semantics. See `_worker_init` in `src/casmi/fork/harness.py`. Also delete `data/cache/train_fp.npz` whenever fingerprint code changes, the cache is not keyed on it.
 - `src/casmi/fork/core.py` is a transplant of the public 0.339 kernel (`kaggle/fork_v2/notebook.py`). Change numerics in the notebook first, then re-transplant, so Kaggle and local stay identical.
 - Validation must group by InChIKey14 and hold out by instrument, never by spectrum. See the table below.
+- Background shell waiters do not survive the end of a session. Never schedule a Kaggle push behind a local timer; push immediately when quota allows, otherwise write the exact command in the notes for the next session (Sep 20 2026: two GPU days lost this way).
 - Commit messages: no em dashes, never mention AI.
 
 ## Architecture
