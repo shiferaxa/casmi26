@@ -1,0 +1,44 @@
+name: kaggle-train
+
+# Pushes a training kernel to Kaggle. Scheduled for the weekly GPU quota refresh
+# (Saturday 00:05 UTC, Friday 20:05 EDT) and available on demand for any kernel folder.
+# Needs the repository secret KAGGLE_API_TOKEN (a Kaggle access token, KGAT_...).
+
+on:
+  schedule:
+    - cron: "5 0 * * 6"
+  workflow_dispatch:
+    inputs:
+      kernel_dir:
+        description: "Kernel folder to push"
+        default: "kaggle/train_fp"
+        required: true
+      accelerator:
+        description: "Accelerator (NvidiaTeslaT4, NvidiaTeslaP100, or none)"
+        default: "NvidiaTeslaT4"
+        required: true
+
+jobs:
+  push:
+    runs-on: ubuntu-latest
+    env:
+      KAGGLE_API_TOKEN: ${{ secrets.KAGGLE_API_TOKEN }}
+      KERNEL_DIR: ${{ github.event.inputs.kernel_dir || 'kaggle/train_fp' }}
+      ACCEL: ${{ github.event.inputs.accelerator || 'NvidiaTeslaT4' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -q kaggle
+      - name: Push kernel
+        run: |
+          cd "$KERNEL_DIR"
+          KID=$(python -c "import json; print(json.load(open('kernel-metadata.json'))['id'])")
+          if [ "$ACCEL" = "none" ]; then
+            kaggle kernels push -p .
+          else
+            kaggle kernels push -p . --accelerator "$ACCEL"
+          fi
+          sleep 60
+          kaggle kernels status "$KID" | tee -a "$GITHUB_STEP_SUMMARY"
