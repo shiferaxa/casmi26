@@ -49,8 +49,7 @@ jobs:
         if: steps.status.outputs.complete == 'true'
         run: |
           cd out
-          META='{"title":"casmi26-fp-own","id":"%s","licenses":[{"name":"CC0-1.0"}]}
-'
+          META='{"title":"casmi26-fp-own","id":"%s","licenses":[{"name":"CC0-1.0"}]}'
           if kaggle datasets status "$DATASET" >/dev/null 2>&1; then
             kaggle datasets files "$DATASET" > ../existing.txt 2>/dev/null || true
             NEW=0
@@ -59,14 +58,16 @@ jobs:
               if grep -q "^$f " ../existing.txt; then echo "already published: $f"; rm "$f"; else NEW=1; fi
             done
             if [ "$NEW" = "1" ]; then
-              printf "$META" "$DATASET" > dataset-metadata.json
+              printf "$META
+" "$DATASET" > dataset-metadata.json
               kaggle datasets version -p . -m "checkpoints from $KERNEL $(date -u +%Y-%m-%dT%H:%MZ)" --dir-mode skip
               echo "published new checkpoints" | tee -a "$GITHUB_STEP_SUMMARY"
             else
               echo "no new checkpoints" | tee -a "$GITHUB_STEP_SUMMARY"
             fi
           else
-            printf "$META" "$DATASET" > dataset-metadata.json
+            printf "$META
+" "$DATASET" > dataset-metadata.json
             kaggle datasets create -p . --dir-mode skip
             echo "created dataset with first checkpoints" | tee -a "$GITHUB_STEP_SUMMARY"
           fi
