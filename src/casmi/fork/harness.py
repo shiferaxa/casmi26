@@ -107,7 +107,7 @@ def save_frag_cache(st: State) -> None:
 
 
 def init(data_root: str, public_root: str, cache_root: str, workers: int | None = None, frag_pool: bool = True,
-         ranker_path: str | None = None, use_bio: bool = False) -> State:
+         ranker_path: str | None = None, use_bio: bool = False, models_dir: str | None = None) -> State:
     t0 = time.time()
     workers = workers or max(2, (os.cpu_count() or 4) - 2)
     core.SEARCH_ROOTS = [data_root, public_root]
@@ -116,7 +116,13 @@ def init(data_root: str, public_root: str, cache_root: str, workers: int | None 
     ranker_path = ranker_path or core.find_file("rank_train.npz")
     print(f"[INFO] ranker training file: {ranker_path}", flush=True)
     core.fit_rankers(ranker_path)
+    # fingerprint checkpoints come only from models_dir (default: the public v2 pair), never from a
+    # recursive sweep of data/, which would pick up every checkpoint ever downloaded
+    models_dir = models_dir or os.path.join(public_root, "casmi26-fp-models-v2")
+    core.SEARCH_ROOTS = [models_dir]
     core.load_neural_models()
+    core.SEARCH_ROOTS = [data_root, public_root]
+    print(f"[INFO] fingerprint models from {models_dir}", flush=True)
 
     d = os.path.dirname(core.find_file("coco_fp.npy"))
     cm = pickle.load(open(os.path.join(d, "coco_meta.pkl"), "rb"))

@@ -55,18 +55,16 @@ def main():
     ap.add_argument("--split", choices=["npx", "overlap"], default="npx")
     ap.add_argument("--workers", type=int, default=None)
     ap.add_argument("--bio", action="store_true", help="add the ChEBI/LIPID MAPS block to the candidate pool")
-    ap.add_argument("--sim-power", type=float, default=None, help="override the analog similarity power (public code 4.0, public ranker rows built at 3.0)")
+    ap.add_argument("--sim-powers", default="4", help="analog similarity powers to rank with, comma separated (public code 4.0, public ranker rows built at 3.0)")
+    ap.add_argument("--models", default=None, help="folder with the fp_*.pt checkpoints for channel 4 (default: public v2)")
     ap.add_argument("--ranker", default=None, help="rank_train.npz to fit the ranker from (default: the one under data/public)")
     args = ap.parse_args()
 
     from casmi.fork import core, harness
     from casmi.metric import mrr_at_k, reciprocal_rank
-    if args.sim_power is not None:
-        core.CFG.SIM_POWER = args.sim_power
-        core.P_SIM = args.sim_power
 
     t0 = time.time()
-    st = harness.init(args.data, args.public, args.cache, workers=args.workers, ranker_path=args.ranker, use_bio=args.bio)
+    st = harness.init(args.data, args.public, args.cache, workers=args.workers, ranker_path=args.ranker, use_bio=args.bio, models_dir=args.models)
 
     cols = ["inchikey14", "normalized_smiles", "ingest_lib", "precursor_mz", "adduct", "ionization_mode",
             "instrument_type", "collision_energy_ev", "ms2_mzs", "ms2_normalized_intensities"]
@@ -98,7 +96,7 @@ def main():
 
     classes = [int(c) for c in args.classes.split(",")]
     prunes = _parse_prunes(args.prunes)
-    rvars = list(product(_parse_floats(args.gates), _parse_floats(args.lib_hards)))
+    rvars = list(product(_parse_floats(args.gates), _parse_floats(args.lib_hards), _parse_floats(args.sim_powers)))
     combos = [(c, p, v) for c in classes for p in prunes for v in rvars]
     results = {k: {} for k in combos}
     ranks = {k: Counter() for k in combos}
@@ -112,6 +110,8 @@ def main():
                 ev = harness.evidence(st, ch, drop_key=key if c == 3 else None, prune_n=p[0], prune_mode=p[1],
                                       use_frag=not args.no_frag)
                 for v in rvars:
+                    core.P_SIM = v[2]
+                    core.CFG.SIM_POWER = v[2]
                     smis = harness.rank(st, ev, lib_gate=v[0], lib_hard=v[1])
                     results[(c, p, v)][key] = smis
                     rr = reciprocal_rank(truth[key], smis)
@@ -120,14 +120,14 @@ def main():
             print(f"  {n+1}/{len(keys)}  {time.time()-t0:.0f}s", flush=True)
             harness.save_frag_cache(st)
 
-    print(f"\nstructures: {len(keys)}  seed {args.seed}  frag {'off' if args.no_frag else 'on'}  ranker {args.ranker or 'default'}  bio {args.bio}  sim_power {args.sim_power or core.P_SIM}")
-    print(f"{'class':<6}{'prune':<11}{'gate':<7}{'lib_hard':<10}{'MRR@25':<9}{'r1':<5}{'r2':<5}{'r3':<5}{'r4-5':<6}{'top25':<7}{'miss':<5}")
+    print(f"\nstructures: {len(keys)}  seed {args.seed}  frag {'off' if args.no_frag else 'on'}  ranker {args.ranker or 'default'}  bio {args.bio}  models {args.models or 'public v2'}")
+    print(f"{'class':<6}{'prune':<11}{'gate':<7}{'lib_hard':<10}{'p_sim':<7}{'MRR@25':<9}{'r1':<5}{'r2':<5}{'r3':<5}{'r4-5':<6}{'top25':<7}{'miss':<5}")
     for k in combos:
         c, p, v = k
         score = mrr_at_k(truth, results[k])
         h = ranks[k]
         top25 = sum(x for r, x in h.items() if r > 0)
-        print(f"{c:<6}{f'{p[0]}:{p[1]}':<11}{str(v[0]):<7}{str(v[1]):<10}{score:<9.4f}{h[1]:<5}{h[2]:<5}{h[3]:<5}"
+        print(f"{c:<6}{f'{p[0]}:{p[1]}':<11}{str(v[0]):<7}{str(v[1]):<10}{str(v[2]):<7}{score:<9.4f}{h[1]:<5}{h[2]:<5}{h[3]:<5}"
               f"{h[4]+h[5]:<6}{top25:<7}{h[0]:<5}")
     print(f"total {time.time() - t0:.0f}s")
 
