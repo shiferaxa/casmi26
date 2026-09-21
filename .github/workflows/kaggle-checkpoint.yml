@@ -40,19 +40,21 @@ jobs:
         if: steps.status.outputs.complete == 'true'
         run: |
           mkdir -p out
-          kaggle kernels output "$KERNEL" -p out --file-pattern "fp_*.pt"
+          # --file-pattern only returns the log, so fetch everything and keep the weights
+          kaggle kernels output "$KERNEL" -p out
+          find out -type f ! -name "fp_*.pt" -delete
           ls -la out
+          if ! ls out/fp_*.pt >/dev/null 2>&1; then echo "no checkpoints in the kernel output" | tee -a "$GITHUB_STEP_SUMMARY"; exit 1; fi
       - name: Publish new checkpoints as a dataset version
         if: steps.status.outputs.complete == 'true'
         run: |
           cd out
           NEW=0
-          if kaggle datasets files "$DATASET" > existing.txt 2>/dev/null; then
+          if kaggle datasets files "$DATASET" > ../existing.txt 2>/dev/null && grep -q "\.pt" ../existing.txt; then
             for f in fp_*.pt; do
               [ -f "$f" ] || continue
-              if grep -q "^$f " existing.txt; then echo "already published: $f"; rm "$f"; else NEW=1; fi
+              if grep -q "^$f " ../existing.txt; then echo "already published: $f"; rm "$f"; else NEW=1; fi
             done
-            rm existing.txt
             if [ "$NEW" = "1" ]; then
               printf '{"title":"casmi26-fp-own","id":"%s","licenses":[{"name":"CC0-1.0"}]}\n' "$DATASET" > dataset-metadata.json
               kaggle datasets version -p . -m "checkpoints from $KERNEL $(date -u +%Y-%m-%dT%H:%MZ)" --dir-mode skip
