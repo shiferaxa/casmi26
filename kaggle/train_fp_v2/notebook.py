@@ -29,8 +29,14 @@ dev = "cuda" if torch.cuda.is_available() else "cpu"
 print("device", dev, torch.cuda.get_device_name(0) if dev == "cuda" else "", flush=True)
 
 
+INPUT_ROOT = os.environ.get("CASMI_INPUT_ROOT", "/kaggle/input")
+OUT_DIR = os.environ.get("CASMI_OUT_DIR", "/kaggle/working")
+if os.environ.get("CASMI_SMOKE"):   # local CPU smoke test: a few tiny steps end to end
+    CFG.update(batch=8, K=7, steps=6, val_every=3, val_n=16, warmup=2, time_budget_h=1.0)
+
+
 def find(name):
-    hits = glob.glob(f"/kaggle/input/**/{name}", recursive=True)
+    hits = glob.glob(f"{INPUT_ROOT}/**/{name}", recursive=True)
     assert hits, name
     return sorted(hits, key=len)[0]
 
@@ -283,8 +289,8 @@ for step in range(CFG["steps"]):
         if va > best:
             best = va
             if best_path and os.path.exists(best_path): os.remove(best_path)
-            best_path = f"/kaggle/working/fp_single_own2_s{step+1}.pt"; save(best_path, step + 1); tag = "  <- best, saved"
-        save("/kaggle/working/fp_single_own2_last.pt", step + 1)
+            best_path = f"{OUT_DIR}/fp_single_own2_s{step+1}.pt"; save(best_path, step + 1); tag = "  <- best, saved"
+        save(f"{OUT_DIR}/fp_single_own2_last.pt", step + 1)
         print(f"  VAL step {step+1} bce {vb:.4f} hardneg-top1 {va:.3f}{tag}  ({time.time()-T0:.0f}s)", flush=True)
     if (time.time() - T0) / 3600 > CFG["time_budget_h"]:
         print("time budget reached", flush=True); break
