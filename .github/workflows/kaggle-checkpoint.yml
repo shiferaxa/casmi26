@@ -30,12 +30,14 @@ jobs:
       - name: Kernel status
         id: status
         run: |
-          S=$(kaggle kernels status "$KERNEL" | tail -1)
+          # a kernel that has not been pushed yet (before its first scheduled run) is not an error
+          S=$(kaggle kernels status "$KERNEL" 2>&1 | tail -1 || true)
           echo "$S" | tee -a "$GITHUB_STEP_SUMMARY"
           case "$S" in
             *COMPLETE*) echo "complete=true" >> "$GITHUB_OUTPUT" ;;
             *) echo "complete=false" >> "$GITHUB_OUTPUT" ;;
           esac
+          exit 0
       - name: Download checkpoints
         if: steps.status.outputs.complete == 'true'
         run: |
