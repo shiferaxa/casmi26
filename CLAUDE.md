@@ -67,7 +67,7 @@ Report val2x and val3. The leaderboard sits between them depending on the class 
 
 ## Automation (GitHub Actions)
 
-- `.github/workflows/kaggle-train.yml` pushes a kernel folder to Kaggle. Runs every Saturday 00:05 UTC (the GPU quota refresh) for `kaggle/train_fp`, and on demand from the Actions tab with any kernel folder and accelerator. Pushing a kernel that is already running restarts it as a new version.
+- `.github/workflows/kaggle-train.yml` pushes a kernel folder to Kaggle. Runs every Saturday 00:05 UTC (the GPU quota refresh) for `kaggle/train_fp_v2`, and on demand from the Actions tab with any kernel folder and accelerator. Pushing a kernel that is already running restarts it as a new version.
 - `.github/workflows/kaggle-checkpoint.yml` runs every six hours: reports the training kernel status and, once complete, publishes new `fp_*.pt` checkpoints to the Kaggle dataset amhashiferaw/casmi26-fp-own (file names carry the epoch, so nothing is published twice) and keeps them as a workflow artifact for 14 days. Inference kernels attach that dataset to use our model.
 - Both need the repository secret `KAGGLE_API_TOKEN` (set Sep 20 2026 from the local token file). Rotate the Kaggle token by updating that secret.
 - Dispatch from the CLI without gh: POST `/repos/shiferaxa/casmi26/actions/workflows/<file>/dispatches` with the credential from `git credential fill`.
