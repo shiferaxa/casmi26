@@ -243,7 +243,7 @@ def scores(z, cand):
 @torch.no_grad()
 def validate():
     model.eval(); vb, vacc = [], []
-    vids = rng.choice(val_ix, size=min(CFG["val_n"], len(val_ix)), replace=False)
+    vids = val_ix[rng.integers(0, len(val_ix), size=min(CFG["val_n"], len(val_ix)))]
     for s in range(0, len(vids), 128):
         inp, ypos, cand = batch(vids[s:s + 128], CFG["K"], aug=False, merge_p=CFG["merge_p"])
         with torch.autocast(device_type="cuda", dtype=torch.float16, enabled=(dev == "cuda")):
@@ -263,7 +263,7 @@ best, best_path = -1.0, None
 rb = rc = racc = 0.0; nr = 0
 for step in range(CFG["steps"]):
     for g in opt.param_groups: g["lr"] = lr_at(step)
-    ids = rng.choice(train_ix, size=CFG["batch"], replace=False)
+    ids = train_ix[rng.integers(0, len(train_ix), size=CFG["batch"])]   # with replacement: no per-step permutation of 2.4M indices
     inp, ypos, cand = batch(ids, CFG["K"], aug=True, merge_p=CFG["merge_p"])
     with torch.autocast(device_type="cuda", dtype=torch.float16, enabled=(dev == "cuda")):
         z = model(*inp)
