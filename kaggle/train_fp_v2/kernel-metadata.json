@@ -1,0 +1,13 @@
+{
+  "id": "amhashiferaw/casmi26-train-fp-v2",
+  "title": "casmi26-train-fp-v2",
+  "code_file": "notebook.py",
+  "language": "python",
+  "kernel_type": "script",
+  "is_private": "true",
+  "enable_gpu": "true",
+  "enable_internet": "false",
+  "dataset_sources": ["amhashiferaw/casmi26-train-fp", "prvsiyan/coconut-casmi26-candidates"],
+  "competition_sources": [],
+  "kernel_sources": ["amhashiferaw/casmi26-prep"]
+}

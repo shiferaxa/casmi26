@@ -55,11 +55,15 @@ def main():
     ap.add_argument("--split", choices=["npx", "overlap"], default="npx")
     ap.add_argument("--workers", type=int, default=None)
     ap.add_argument("--bio", action="store_true", help="add the ChEBI/LIPID MAPS block to the candidate pool")
+    ap.add_argument("--sim-power", type=float, default=None, help="override the analog similarity power (public code 4.0, public ranker rows built at 3.0)")
     ap.add_argument("--ranker", default=None, help="rank_train.npz to fit the ranker from (default: the one under data/public)")
     args = ap.parse_args()
 
-    from casmi.fork import harness
+    from casmi.fork import core, harness
     from casmi.metric import mrr_at_k, reciprocal_rank
+    if args.sim_power is not None:
+        core.CFG.SIM_POWER = args.sim_power
+        core.P_SIM = args.sim_power
 
     t0 = time.time()
     st = harness.init(args.data, args.public, args.cache, workers=args.workers, ranker_path=args.ranker, use_bio=args.bio)
@@ -116,7 +120,7 @@ def main():
             print(f"  {n+1}/{len(keys)}  {time.time()-t0:.0f}s", flush=True)
             harness.save_frag_cache(st)
 
-    print(f"\nstructures: {len(keys)}  seed {args.seed}  frag {'off' if args.no_frag else 'on'}  ranker {args.ranker or 'default'}  bio {args.bio}")
+    print(f"\nstructures: {len(keys)}  seed {args.seed}  frag {'off' if args.no_frag else 'on'}  ranker {args.ranker or 'default'}  bio {args.bio}  sim_power {args.sim_power or core.P_SIM}")
     print(f"{'class':<6}{'prune':<11}{'gate':<7}{'lib_hard':<10}{'MRR@25':<9}{'r1':<5}{'r2':<5}{'r3':<5}{'r4-5':<6}{'top25':<7}{'miss':<5}")
     for k in combos:
         c, p, v = k

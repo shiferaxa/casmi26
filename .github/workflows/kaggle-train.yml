@@ -11,7 +11,7 @@ on:
     inputs:
       kernel_dir:
         description: "Kernel folder to push"
-        default: "kaggle/train_fp"
+        default: "kaggle/train_fp_v2"
         required: true
       accelerator:
         description: "Accelerator (NvidiaTeslaT4, NvidiaTeslaP100, or none)"
@@ -23,7 +23,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       KAGGLE_API_TOKEN: ${{ secrets.KAGGLE_API_TOKEN }}
-      KERNEL_DIR: ${{ github.event.inputs.kernel_dir || 'kaggle/train_fp' }}
+      KERNEL_DIR: ${{ github.event.inputs.kernel_dir || 'kaggle/train_fp_v2' }}
       ACCEL: ${{ github.event.inputs.accelerator || 'NvidiaTeslaT4' }}
     steps:
       - uses: actions/checkout@v4
