@@ -55,13 +55,14 @@ def main():
     ap.add_argument("--overlap-classes", default="3", help="classes to dump for the overlap structures")
     ap.add_argument("--tag", default="c12")
     ap.add_argument("--workers", type=int, default=None)
+    ap.add_argument("--models", default=None, help="folder with the fp_*.pt checkpoints for channel 4 (default: public v2)")
     args = ap.parse_args()
 
     from casmi.fork import harness, core
     from casmi.metric import key14
 
     t0 = time.time()
-    st = harness.init(args.data, args.public, args.cache, workers=args.workers, ranker_path=args.ranker)
+    st = harness.init(args.data, args.public, args.cache, workers=args.workers, ranker_path=args.ranker, models_dir=args.models)
     pool_k14 = pool_canonical_keys(Path(args.cache), Path(args.public))
     assert len(pool_k14) == len(st.pool.mass)
     # harness pool is sorted by mass; recover the permutation to align canonical keys
