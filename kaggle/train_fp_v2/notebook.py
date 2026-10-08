@@ -24,7 +24,13 @@ CFG = dict(
     lr=3e-4, wd=0.01, warmup=2000, steps=40000, lr_floor=0.02,
     val_every=1000, val_n=2048, time_budget_h=5.3, seed=7,
 )
+# per-run overrides for a rented GPU box (scripts/runpod_setup.sh); Kaggle runs use the defaults
+for _k, _v in os.environ.items():
+    if _k.startswith("CASMI_CFG_") and _k[10:].lower() in CFG:
+        _n = _k[10:].lower(); CFG[_n] = type(CFG[_n])(float(_v)) if isinstance(CFG[_n], (int, float)) else _v
+TAG = os.environ.get("CASMI_TAG", "own2")
 torch.manual_seed(CFG["seed"]); rng = np.random.default_rng(CFG["seed"])
+print("cfg", CFG, "tag", TAG, flush=True)
 dev = "cuda" if torch.cuda.is_available() else "cpu"
 print("device", dev, torch.cuda.get_device_name(0) if dev == "cuda" else "", flush=True)
 
@@ -289,8 +295,8 @@ for step in range(CFG["steps"]):
         if va > best:
             best = va
             if best_path and os.path.exists(best_path): os.remove(best_path)
-            best_path = f"{OUT_DIR}/fp_single_own2_s{step+1}.pt"; save(best_path, step + 1); tag = "  <- best, saved"
-        save(f"{OUT_DIR}/fp_single_own2_last.pt", step + 1)
+            best_path = f"{OUT_DIR}/fp_single_{TAG}_s{step+1}.pt"; save(best_path, step + 1); tag = "  <- best, saved"
+        save(f"{OUT_DIR}/fp_single_{TAG}_last.pt", step + 1)
         print(f"  VAL step {step+1} bce {vb:.4f} hardneg-top1 {va:.3f}{tag}  ({time.time()-T0:.0f}s)", flush=True)
     if (time.time() - T0) / 3600 > CFG["time_budget_h"]:
         print("time budget reached", flush=True); break
