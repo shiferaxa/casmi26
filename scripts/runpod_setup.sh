@@ -7,7 +7,8 @@ set -euo pipefail
 W=/workspace
 mkdir -p $W/input $W/runs $W/src
 export KAGGLE_CONFIG_DIR=$W/.kaggle
-pip install -q kaggle numpy
+# the template's system Python is PEP 668 managed and already has torch, so install into it
+pip install -q --break-system-packages kaggle numpy
 if [ ! -f $W/input/prep/tokens_mz.npy ]; then
   kaggle kernels output amhashiferaw/casmi26-prep -p $W/input/prep
 fi
