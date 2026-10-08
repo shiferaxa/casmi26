@@ -11,3 +11,4 @@ kaggle/*/rank_train.npz
 kaggle/rdkit_wheel/*.whl
 kaggle/dataset/*.py
 kaggle/train_fp/*.npz
+kaggle/fp_own3_dataset/*.pt
