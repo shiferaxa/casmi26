@@ -15,9 +15,12 @@ out = {"id": f"amhashiferaw/{ours}", "title": ours, "code_file": "notebook.ipynb
        "dataset_sources": [x for x in m.get("dataset_sources", []) if x],
        "competition_sources": ["enveda-CASMI26-molecule-id-mass-spectra"], "kernel_sources": [x for x in m.get("kernel_sources", []) if x],
        "model_sources": [x for x in m.get("model_sources", []) if x]}
+# keep the author's pinned Docker image: without it the v4n fork scored 0.378 instead of 0.415 (Oct 2026)
+if m.get("docker_image"):
+    out["docker_image"] = m["docker_image"]; out["docker_image_pinning_type"] = "original"
 json.dump(out, open(d + '/kernel-metadata.json', 'w'), indent=2)
 nb = json.load(open(d + '/notebook.ipynb', encoding='utf-8'))
-nb['cells'].insert(0, {"cell_type": "markdown", "metadata": {}, "source": [f"Private fork of {src} (Apache 2.0), run unchanged on CPU."]})
+nb['cells'].insert(0, {"cell_type": "markdown", "metadata": {}, "source": [f"Private fork of {src} (Apache 2.0), run unchanged, author's Docker image pinned."]})
 json.dump(nb, open(d + '/notebook.ipynb', 'w', encoding='utf-8'))
 print('prepared', out['id'], 'datasets', len(out['dataset_sources']))
 PY
